@@ -1,0 +1,320 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Randomdankcode</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+
+				<!-- Header -->
+					<header id="header">
+						<a href="index.html" class="logo">LChenxin</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="generic.html">About</a></li>
+							<li class="active"><a href="index.html">Random blog</a></li>
+							<li><a href="CV.html">CV (Under construction)</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="https://www.facebook.com/profile.php?id=100033475112216" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="https://github.com/LChenxin" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Featured Post -->
+
+								<header class="major">
+									<span class="date">April, 2021</span>
+									<h2><a href="Lo21Td3.html">Lo21 TD3<br /></a></h2>
+									<p>C++ La classe Fraction; Surcharge d’opérateurs; et Exceptions</p>
+								</header>
+								<!-- Preformatted Code -->
+								<h2>fraction.h</h2>
+								<pre><code>i = 0;
+
+#include <iostream>
+
+/*
++_________________________+
+    Fraction
+    ___________
+    - numerateur : int
+    - denominateur : int
+    ___________
+    ___________
+    + Fraction(in n, int d)
+    + setFraction(int n, int d)
+    + getNumerateur() : int
+    + getDenomintaeur() : int
+    - simplification()
+    + somme()
+
++_________________________+
+ */
+
+namespace MATH
+{
+    class FractionException
+    {
+        std::string info;
+
+    public:
+        FractionException(const std::string& s) : info(s) {}
+        std::string getInfo() const
+        {
+            return info;
+        }
+    };
+    class Fraction
+    {
+
+    private:
+        int numerateur;
+        int denominateur;
+        void simplification();
+
+    public:
+        Fraction(int n = 0, int d = 1);
+
+        void setFraction(int n, int d);
+        int getNumerateur() const { return numerateur; }
+        int getDenominateur() const { return denominateur; }
+        Fraction somme(const Fraction& f);
+        // Fraction operator+(const Fraction &f);
+
+        ~Fraction()
+        {
+            std::cout << "destruction " << this << "\n";
+        }
+
+        Fraction& operator++()
+        {
+            numerateur += denominateur;
+            return *this;
+        };                       // préfixe, renvoie une lvalue sur x (après incrémentation) // ++x
+        Fraction operator++(int) // argument int fictif pour indiquer que c'est en post fixe // x++
+        {
+            Fraction old = *this;
+            numerateur += denominateur;
+            return old;
+        }
+    }; // postfixe, renvoie l'ancienne valeur de x
+
+    Fraction somme(const Fraction& f1, const Fraction& f2);
+    Fraction operator+(Fraction const& a, Fraction const& b);
+    Fraction operator-(Fraction const& a, Fraction const& b);
+
+    inline Fraction& operator--(Fraction& f)
+    {
+        f = f - 1;
+        return f;
+    }
+    inline Fraction operator--(Fraction& f, int)
+    {
+        Fraction old = f;
+        f = f - 1;
+        return old;
+    }
+
+} // namespace MATH
+
+std::ostream&
+operator<<(std::ostream& out, const MATH::Fraction& obj);
+
+
+</code></pre>
+<!-- Preformatted Code -->
+<h2>fraction.cpp</h2>
+<pre><code>i = 0;
+	#include "fraction.h"
+	#include <iostream>
+	
+	namespace MATH
+	{
+		Fraction::Fraction(int n, int d)
+		{
+			std::cout << "construction " << this << "\n";
+			setFraction(n, d);
+		};
+	
+		void Fraction::setFraction(int n, int d)
+		{
+			numerateur = n;
+			if (!d)
+				throw FractionException("Erreur, denominateur null"); // déclenchement d'une exception
+			denominateur = d;
+	
+			simplification();
+		}
+	
+		void Fraction::simplification()
+		{
+			if (numerateur == 0)
+			{
+				denominateur = 1;
+				return;
+			}
+			if (denominateur == 0)
+				return;
+			int a = numerateur, b = denominateur;
+			if (a < 0)
+				a = -a;
+			if (b < 0)
+				b = -b;
+			while (a != b)
+			{
+				if (a > b)
+					a = a - b;
+				else
+					b = b - a;
+			}
+			numerateur /= a;
+			denominateur /= a;
+			if (denominateur < 0)
+			{
+				denominateur = -b;
+				numerateur = -a;
+			}
+		}
+	
+		Fraction Fraction::somme(const Fraction& f)
+		{
+			int sumNum = f.numerateur * denominateur + f.denominateur * numerateur;
+			int prodDen = f.denominateur * denominateur;
+			Fraction res(sumNum, prodDen);
+			return res;
+		}
+	
+		// Fraction Fraction::operator+(const Fraction &f)
+		// {
+		//     int sumNum = f.numerateur * denominateur + f.denominateur * numerateur;
+		//     int prodDen = f.denominateur * denominateur;
+		//     Fraction res(sumNum, prodDen);
+		//     return res;
+		// }
+	
+		Fraction somme(const Fraction& f1, const Fraction& f2)
+		{
+			int sumNum = f1.getNumerateur() * f2.getDenominateur() + f1.getDenominateur() * f2.getNumerateur();
+			int prodDen = f1.getDenominateur() * f2.getDenominateur();
+			Fraction res(sumNum, prodDen);
+			return res;
+		}
+	
+		Fraction operator+(const Fraction& f1, const Fraction& f2)
+		{
+			int sumNum = f1.getNumerateur() * f2.getDenominateur() + f1.getDenominateur() * f2.getNumerateur();
+			int prodDen = f1.getDenominateur() * f2.getDenominateur();
+			Fraction res(sumNum, prodDen);
+			return res;
+		}
+		Fraction operator-(const Fraction& f1, const Fraction& f2)
+		{
+			int sumNum = f1.getNumerateur() * f2.getDenominateur() - f1.getDenominateur() * f2.getNumerateur();
+			int prodDen = f1.getDenominateur() * f2.getDenominateur();
+			Fraction res(sumNum, prodDen);
+			return res;
+		}
+		Fraction operator++(const Fraction& f1, int)
+		{
+			Fraction res(f1.getNumerateur() + f1.getDenominateur(), f1.getDenominateur());
+			return res;
+		}
+	} // namespace MATH
+	
+	std::ostream& operator<<(std::ostream& out, const MATH::Fraction& obj)
+	{
+		out << obj.getNumerateur() << "/" << obj.getDenominateur();
+		return out;
+	}
+	
+</code></pre>
+<!-- Preformatted Code -->
+<h2>fraction.cpp</h2>
+<pre><code>i = 0;
+	#include "fraction.h"
+	#include <iostream>
+	using namespace MATH;
+	using namespace std;
+	
+	Fraction* myFunction()
+	{
+		Fraction fx(7, 8);
+		Fraction* pfy = new Fraction(2, 3);
+		return pfy;
+	}
+	int main()
+	{
+		try
+		{
+			Fraction f1(3, 4);
+			Fraction f2(1, 6);
+			Fraction f3;
+			f3 = f1 + f2;
+			cout
+				<< "\n"
+				<< f3;
+			f3++;
+			cout << "\n"
+				<< f3--;
+			Fraction f4(1, 0);
+		}
+		catch (const FractionException& e) // Catch des éventuelles erreurs
+		{
+			cout << e.getInfo() << "\n";
+		}
+	
+		// Fraction *pf3 = new Fraction(1, 2);
+		// Fraction *pf6;
+	
+		// {
+		//     cout << "ouverture d’un bloc\n";
+		//     Fraction f4(3, 8);
+		//     Fraction f5(4, 6);
+		//     pf6 = new Fraction(1, 3);
+		//     cout << "fin d’un bloc\n";
+		// }
+	
+		// cout << "debut d’une fonction\n";
+		// Fraction *pf7 = myFunction();
+		// cout << "fin d’une fonction\n";
+		// cout << "desallocations controlee par l’utilisateur :\n";
+		// delete pf6;
+		// delete pf7;
+		return 0;
+	}
+</code></pre>
+
+
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
